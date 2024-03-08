@@ -14,7 +14,7 @@ dependencyResolutionManagement {
 
 Add the dependency in build.gradle file.
 ```gradle
-implementation 'com.github.mutkuensert:BitmapCompression:1.0'
+implementation 'com.github.mutkuensert:BitmapCompression:1.1'
 ```
 
 ## Class Information
