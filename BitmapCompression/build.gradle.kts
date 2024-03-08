@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.appcompat.v7)
     implementation(libs.androidx.annotation.jvm)
     implementation(libs.androidx.core.ktx)
 }
@@ -46,7 +45,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.mutkuensert"
                 artifactId = "bitmapcompression"
-                version = "1.0"
+                version = "1.2"
             }
         }
     }
