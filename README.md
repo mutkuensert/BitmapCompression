@@ -20,6 +20,7 @@ implementation 'com.github.mutkuensert:BitmapCompression:2.0'
 ## Class Information
 ```kotlin
 /**
+ * @property file The file to be reduced in size. It will be overwritten with the size reduction processes.
  * @property sizeLimitBytes Max size the file can be after compression.
  * @property compressPriority Start reducing file size by scaling down or compressing.
  * @property lowerWidthLimit Stop scaling down before dropping down below this value.

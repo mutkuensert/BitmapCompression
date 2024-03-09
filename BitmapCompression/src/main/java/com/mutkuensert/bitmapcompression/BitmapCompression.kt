@@ -12,6 +12,7 @@ import java.io.File
 private const val TAG = "BitmapCompression"
 
 /**
+ * @property file The file to be reduced in size. It will be overwritten with the size reduction processes.
  * @property sizeLimitBytes Max size the file can be after compression.
  * @property compressPriority Start reducing file size by scaling down or compressing.
  * @property lowerWidthLimit Stop scaling down before dropping down below this value.
@@ -36,6 +37,10 @@ class BitmapCompression(
     private var bitmap = BitmapFactory.decodeFile(file.absolutePath)
 
     companion object {
+
+        /**
+         * @param file The file will be overwritten with the size reduction processes.
+         */
         fun compress(
             file: File,
             @IntRange(from = 0, to = 100)
