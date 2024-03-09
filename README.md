@@ -47,7 +47,8 @@ under a specified size limit while maintaining control over compression paramete
 
 
 ## Usage
-This example reduces the file size under 1048576 value and prevents scaling the image width down below 1080 pixels.
+In this example, size reduction starts with scaling down the file prior to compressing process, 
+aiming to reduce the size under 1048576 bytes and prevents scaling the image width down below 1080 pixels.
 ```kotlin
 BitmapCompression(
     file = tempFile,
