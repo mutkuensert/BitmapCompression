@@ -60,13 +60,17 @@ BitmapCompression(
 Scale down a bitmap or a file preserving the aspect ratio.
 ```kotlin
 val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToWidth(bitmap, 1080)
+```
 
+```kotlin
 BitmapCompression.scaleDownToWidth(tempFile, 1080)
 ```
 
 ```kotlin
 val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToHeight(bitmap, 1920)
+```
 
+```kotlin
 BitmapCompression.scaleDownToHeight(tempFile, 1920)
 ```
 
