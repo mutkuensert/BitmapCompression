@@ -2,11 +2,14 @@ package com.mutkuensert.bitmapcompression
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.core.graphics.scale
 import java.io.ByteArrayOutputStream
 import java.io.File
+
+private const val TAG = "BitmapCompression"
 
 /**
  * @property sizeLimitBytes Max size the file can be after compression.
@@ -17,6 +20,7 @@ import java.io.File
  * @property scaleDownFactor Scale factor to divide width and height of image in every loop.
  */
 class BitmapCompression(
+    private val file: File,
     val sizeLimitBytes: Int,
     val compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
     val lowerWidthLimit: Int? = null,
@@ -26,49 +30,148 @@ class BitmapCompression(
     @FloatRange(from = 0.1, to = 0.9)
     val scaleDownFactor: Float = 0.5f
 ) {
-    fun compress(file: File) {
-        if (file.length() < sizeLimitBytes) return
+    private var _currentCompressionQuality = 90
+    val currentCompressionQuality: Int get() = _currentCompressionQuality
 
+    private var bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
+    companion object {
+        fun compress(
+            file: File,
+            @IntRange(from = 0, to = 100)
+            quality: Int,
+        ) {
+            val newBitmap = compress(BitmapFactory.decodeFile(file.absolutePath), quality)
+
+            val byteArrayOutputStream = newBitmap.createOutputStream()
+
+            file.overwriteByStream(byteArrayOutputStream)
+            byteArrayOutputStream.close()
+        }
+
+        fun compress(
+            bitmap: Bitmap,
+            @IntRange(from = 0, to = 100)
+            quality: Int
+        ): Bitmap {
+            val byteArrayOutputStream = ByteArrayOutputStream()
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
+
+            val newBitmap = BitmapFactory.decodeByteArray(
+                byteArrayOutputStream.toByteArray(),
+                0,
+                byteArrayOutputStream.size()
+            )
+
+            byteArrayOutputStream.close()
+
+            return newBitmap
+        }
+
+        /**
+         * @throws IllegalArgumentException If width argument is bigger than image width.
+         */
+        fun scaleDownToWidth(
+            file: File,
+            width: Int
+        ) {
+            var bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
+            bitmap = scaleDownToWidth(bitmap, width)
+
+            val outputStream = bitmap.createOutputStream()
+            file.overwriteByStream(outputStream)
+            outputStream.close()
+        }
+
+        /**
+         * @throws IllegalArgumentException If width argument is bigger than bitmap width.
+         */
+        fun scaleDownToWidth(
+            bitmap: Bitmap,
+            width: Int
+        ): Bitmap {
+            if (width > bitmap.width) {
+                throw IllegalArgumentException("Argument $width is bigger than ${bitmap.width}")
+            }
+
+            return bitmap.scale(
+                width = width,
+                height = bitmap.getHeightByWidth(width)
+            )
+        }
+
+        /**
+         * @throws IllegalArgumentException If height argument is bigger than image height.
+         */
+        fun scaleDownToHeight(
+            file: File,
+            height: Int
+        ) {
+            var bitmap = BitmapFactory.decodeFile(file.absolutePath)
+
+            bitmap = scaleDownToHeight(bitmap, height)
+
+            val outputStream = bitmap.createOutputStream()
+            file.overwriteByStream(outputStream)
+            outputStream.close()
+        }
+
+        /**
+         * @throws IllegalArgumentException If height argument is bigger than bitmap height.
+         */
+        fun scaleDownToHeight(
+            bitmap: Bitmap,
+            height: Int
+        ): Bitmap {
+            if (height > bitmap.height) {
+                throw IllegalArgumentException("Argument $height is bigger than ${bitmap.height}")
+            }
+
+            return bitmap.scale(
+                width = bitmap.getWidthByHeight(height),
+                height = height
+            )
+        }
+    }
+
+    /**
+     * @throws RuntimeException If compression and scaling down processes can't reduce the file size
+     * under the limit with current configuration.
+     */
+    fun compressAndScaleDown() {
+        if (file.length() < sizeLimitBytes) {
+            Log.i(TAG, "$file: File is already under the size limit.")
+            return
+        }
+
+        compressAndScaleDownByPriority()
+    }
+
+    private fun compress() {
+        var factor = 90
         val byteArrayOutputStream = ByteArrayOutputStream()
 
-        var bitmap = BitmapFactory.decodeFile(file.absolutePath)
+        do {
+            byteArrayOutputStream.reset()
 
-        bitmap = compressByPriority(bitmap, byteArrayOutputStream)
+            _currentCompressionQuality = factor
+            bitmap.compress(Bitmap.CompressFormat.JPEG, factor, byteArrayOutputStream)
+            factor -= 10
 
-        bitmap.recycle()
+            file.overwriteByStream(byteArrayOutputStream)
 
-        file.delete()
-        file.createNewFile()
-        file.outputStream().use {
-            byteArrayOutputStream.writeTo(it)
-        }
+            if (factor <= compressionQualityDownTo) break
+        } while (file.length() >= sizeLimitBytes)
 
         byteArrayOutputStream.close()
     }
 
-    private fun compressBitmap(
-        bitmap: Bitmap,
-        byteArrayOutputStream: ByteArrayOutputStream,
-    ) {
-        var factor = 90
-
-        do {
-            byteArrayOutputStream.reset()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, factor, byteArrayOutputStream)
-            factor -= 10
-            if (factor <= compressionQualityDownTo) break
-        } while (byteArrayOutputStream.size() >= sizeLimitBytes)
-    }
-
-    private fun getScaledDownBitmap(
-        bitmap: Bitmap,
-        byteArrayOutputStream: ByteArrayOutputStream,
-    ): Bitmap {
-        var scaledDownBitmap = bitmap
-
-        do {
-            val scaledDownWidth = scaledDownBitmap.width * scaleDownFactor
-            val scaledDownHeight = scaledDownBitmap.height * scaleDownFactor
+    private fun scaleDown() {
+        while ((file.length() >= sizeLimitBytes)) {
+            val scaledDownWidth = bitmap.width * scaleDownFactor
+            val scaledDownHeight = bitmap.height * scaleDownFactor
 
             if ((lowerWidthLimit != null && scaledDownWidth < lowerWidthLimit)
                 || (lowerHeightLimit != null && scaledDownHeight < lowerHeightLimit)
@@ -78,39 +181,32 @@ class BitmapCompression(
                 } else {
                     throw RuntimeException(
                         "File is too big for specified upper limits. " +
-                                "Try with lower limits."
+                                "Try with lower size limits or change compress priority to " +
+                                "CompressPriority.STARTBYCOMPRESS"
                     )
                 }
             }
 
-            scaledDownBitmap = scaledDownBitmap.scale(
+            bitmap = bitmap.scale(
                 width = scaledDownWidth.toInt(),
                 height = scaledDownHeight.toInt()
             )
-            byteArrayOutputStream.reset()
-            scaledDownBitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream)
-        } while ((byteArrayOutputStream.size() >= sizeLimitBytes))
 
-        return scaledDownBitmap
+            file.overwriteByBitmap(bitmap, currentCompressionQuality)
+        }
     }
 
     enum class CompressPriority {
         STARTBYSCALEDOWN, STARTBYCOMPRESS
     }
 
-    private fun compressByPriority(
-        bitmap: Bitmap,
-        byteArrayOutputStream: ByteArrayOutputStream,
-    ): Bitmap {
-        var newBitmap = bitmap
-
+    private fun compressAndScaleDownByPriority() {
         if (compressPriority == CompressPriority.STARTBYSCALEDOWN) {
-            newBitmap = getScaledDownBitmap(newBitmap, byteArrayOutputStream)
-            compressBitmap(newBitmap, byteArrayOutputStream)
+            scaleDown()
+            compress()
         } else {
-            compressBitmap(newBitmap, byteArrayOutputStream)
-            newBitmap = getScaledDownBitmap(newBitmap, byteArrayOutputStream)
+            compress()
+            scaleDown()
         }
-        return newBitmap
     }
 }
