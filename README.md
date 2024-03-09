@@ -48,11 +48,11 @@ This library is particularly useful for reducing image file sizes in Android app
 ## Basic Usage
 ```kotlin
 BitmapCompression(
-    sizeLimitBytes = MAX_BYTES_SERVER_ACCEPTS,
+    sizeLimitBytes = 1000000,
     lowerWidthLimit = 480
 ).compress(tempFile)
 ```
-This example compresses the file under MAX_BYTES_SERVER_ACCEPTS value and prevents scaling the image width down below 480 pixels.
+This example compresses the file under 1000000 bytes and prevents scaling the image width down below 480 pixels.
 
  ## License
 ```xml
