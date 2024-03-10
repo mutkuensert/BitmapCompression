@@ -49,13 +49,24 @@ under a specified size limit while maintaining control over compression paramete
 ## Usage
 In this example, size reduction starts with scaling down the file prior to compressing process, 
 aiming to reduce the size under 1048576 bytes and prevents scaling the image width down below 1080 pixels.
+If the size reduction can't succeed, lowerWidthLimit is being set to a lower level and compressAndScale 
+function is invoked again so that the size can be lower.
+reduced.
 ```kotlin
-BitmapCompression(
+val compression = BitmapCompression(
     file = tempFile,
     sizeLimitBytes = 1048576,
     compressPriority = BitmapCompression.CompressPriority.STARTBYSCALEDOWN,
-    lowerWidthLimit = 1080
-).compressAndScaleDown()
+    lowerWidthLimit = 5000,
+    compressionQualityDownTo = 90
+)
+
+try {
+    compression.compressAndScaleDown()
+} catch (exception: ScaleDownException) {
+    compression.lowerWidthLimit = 1920
+    compression.compressAndScaleDown()
+}
 ```
 
 ### Static functions

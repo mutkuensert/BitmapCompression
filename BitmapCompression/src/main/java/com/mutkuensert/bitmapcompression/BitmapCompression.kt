@@ -22,14 +22,14 @@ private const val TAG = "BitmapCompression"
  */
 class BitmapCompression(
     private val file: File,
-    val sizeLimitBytes: Int,
-    val compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
-    val lowerWidthLimit: Int? = null,
-    val lowerHeightLimit: Int? = null,
+    var sizeLimitBytes: Int,
+    var compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
+    var lowerWidthLimit: Int? = null,
+    var lowerHeightLimit: Int? = null,
     @IntRange(from = 1, to = 90)
-    val compressionQualityDownTo: Int = 10,
+    var compressionQualityDownTo: Int = 10,
     @FloatRange(from = 0.1, to = 0.9)
-    val scaleDownFactor: Float = 0.5f
+    var scaleDownFactor: Float = 0.8f
 ) {
     private var _currentCompressionQuality = 90
     val currentCompressionQuality: Int get() = _currentCompressionQuality
@@ -142,8 +142,8 @@ class BitmapCompression(
     }
 
     /**
-     * @throws RuntimeException If compression and scaling down processes can't reduce the file size
-     * under the limit with current configuration.
+     * @throws SizeException If compression and scaling down processes can't reduce the file
+     * size under the limit with current configuration.
      */
     fun compressAndScaleDown() {
         if (file.length() < sizeLimitBytes) {
@@ -152,6 +152,14 @@ class BitmapCompression(
         }
 
         compressAndScaleDownByPriority()
+
+        if (file.length() > sizeLimitBytes) {
+            throw SizeException(
+                "File is too big for specified limits. " +
+                        "You can try with lower resolution limits, increasing scaleDownFactor " +
+                        "or change compress priority to CompressPriority.STARTBYCOMPRESS"
+            )
+        }
     }
 
     private fun compress() {
@@ -168,28 +176,20 @@ class BitmapCompression(
             file.overwriteByStream(byteArrayOutputStream)
 
             if (factor <= compressionQualityDownTo) break
-        } while (file.length() >= sizeLimitBytes)
+        } while (file.length() > sizeLimitBytes)
 
         byteArrayOutputStream.close()
     }
 
     private fun scaleDown() {
-        while ((file.length() >= sizeLimitBytes)) {
+        while ((file.length() > sizeLimitBytes)) {
             val scaledDownWidth = bitmap.width * scaleDownFactor
             val scaledDownHeight = bitmap.height * scaleDownFactor
 
-            if ((lowerWidthLimit != null && scaledDownWidth < lowerWidthLimit)
-                || (lowerHeightLimit != null && scaledDownHeight < lowerHeightLimit)
+            if ((lowerWidthLimit != null && scaledDownWidth < lowerWidthLimit!!)
+                || (lowerHeightLimit != null && scaledDownHeight < lowerHeightLimit!!)
             ) {
-                if (compressPriority == CompressPriority.STARTBYSCALEDOWN) {
-                    break
-                } else {
-                    throw RuntimeException(
-                        "File is too big for specified upper limits. " +
-                                "Try with lower size limits or change compress priority to " +
-                                "CompressPriority.STARTBYCOMPRESS"
-                    )
-                }
+                break
             }
 
             bitmap = bitmap.scale(
