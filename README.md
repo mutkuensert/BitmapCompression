@@ -30,14 +30,14 @@ implementation 'com.github.mutkuensert:BitmapCompression:2.1'
  */
 class BitmapCompression(
     private val file: File,
-    val sizeLimitBytes: Int,
-    val compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
-    val lowerWidthLimit: Int? = null,
-    val lowerHeightLimit: Int? = null,
+    var sizeLimitBytes: Int,
+    var compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
+    var lowerWidthLimit: Int? = null,
+    var lowerHeightLimit: Int? = null,
     @IntRange(from = 1, to = 90)
-    val compressionQualityDownTo: Int = 10,
+    var compressionQualityDownTo: Int = 10,
     @FloatRange(from = 0.1, to = 0.9)
-    val scaleDownFactor: Float = 0.5f
+    var scaleDownFactor: Float = 0.8f
 )
 ```
 
@@ -63,7 +63,7 @@ val compression = BitmapCompression(
 
 try {
     compression.compressAndScaleDown()
-} catch (exception: ScaleDownException) {
+} catch (exception: SizeException) {
     compression.lowerWidthLimit = 1920
     compression.compressAndScaleDown()
 }
