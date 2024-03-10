@@ -45,7 +45,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.mutkuensert"
                 artifactId = "bitmapcompression"
-                version = "2.0"
+                version = "2.1"
             }
         }
     }
