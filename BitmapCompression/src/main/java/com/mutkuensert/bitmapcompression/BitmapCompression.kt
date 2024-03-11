@@ -74,9 +74,6 @@ class BitmapCompression(
             return newBitmap
         }
 
-        /**
-         * @throws IllegalArgumentException If width argument is bigger than image width.
-         */
         fun scaleDownToWidth(
             file: File,
             width: Int
@@ -90,15 +87,13 @@ class BitmapCompression(
             outputStream.close()
         }
 
-        /**
-         * @throws IllegalArgumentException If width argument is bigger than bitmap width.
-         */
         fun scaleDownToWidth(
             bitmap: Bitmap,
             width: Int
         ): Bitmap {
-            if (width > bitmap.width) {
-                throw IllegalArgumentException("Argument $width is bigger than ${bitmap.width}")
+            if (width >= bitmap.width) {
+                Log.i(TAG, "Argument $width is already bigger than or equal to ${bitmap.width}")
+                return bitmap
             }
 
             return bitmap.scale(
@@ -107,9 +102,6 @@ class BitmapCompression(
             )
         }
 
-        /**
-         * @throws IllegalArgumentException If height argument is bigger than image height.
-         */
         fun scaleDownToHeight(
             file: File,
             height: Int
@@ -123,15 +115,13 @@ class BitmapCompression(
             outputStream.close()
         }
 
-        /**
-         * @throws IllegalArgumentException If height argument is bigger than bitmap height.
-         */
         fun scaleDownToHeight(
             bitmap: Bitmap,
             height: Int
         ): Bitmap {
-            if (height > bitmap.height) {
-                throw IllegalArgumentException("Argument $height is bigger than ${bitmap.height}")
+            if (height >= bitmap.height) {
+                Log.i(TAG, "Argument $height is already bigger than or equal to ${bitmap.height}")
+                return bitmap
             }
 
             return bitmap.scale(
@@ -146,8 +136,8 @@ class BitmapCompression(
      * size under the limit with current configuration.
      */
     fun compressAndScaleDown() {
-        if (file.length() < sizeLimitBytes) {
-            Log.i(TAG, "$file: File is already under the size limit.")
+        if (file.length() <= sizeLimitBytes) {
+            Log.i(TAG, "File ${file.name} is already under the size limit.")
             return
         }
 
