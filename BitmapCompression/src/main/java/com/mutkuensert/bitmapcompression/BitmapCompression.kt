@@ -74,6 +74,9 @@ class BitmapCompression(
             return newBitmap
         }
 
+        /**
+         * Scale down preserving the aspect ratio.
+         */
         fun scaleDownToWidth(
             file: File,
             width: Int
@@ -87,6 +90,9 @@ class BitmapCompression(
             outputStream.close()
         }
 
+        /**
+         * Scale down preserving the aspect ratio.
+         */
         fun scaleDownToWidth(
             bitmap: Bitmap,
             width: Int
@@ -102,6 +108,9 @@ class BitmapCompression(
             )
         }
 
+        /**
+         * Scale down preserving the aspect ratio.
+         */
         fun scaleDownToHeight(
             file: File,
             height: Int
@@ -115,6 +124,9 @@ class BitmapCompression(
             outputStream.close()
         }
 
+        /**
+         * Scale down preserving the aspect ratio.
+         */
         fun scaleDownToHeight(
             bitmap: Bitmap,
             height: Int

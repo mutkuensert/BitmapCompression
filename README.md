@@ -14,7 +14,7 @@ dependencyResolutionManagement {
 
 Add the dependency in build.gradle file.
 ```gradle
-implementation 'com.github.mutkuensert:BitmapCompression:2.1'
+implementation 'com.github.mutkuensert:BitmapCompression:2.1.1'
 ```
 
 ## Class Information
@@ -71,19 +71,19 @@ try {
 ### Static functions
 Scale down a bitmap or a file preserving the aspect ratio.
 ```kotlin
-val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToWidth(bitmap, 1080)
+val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToWidth(bitmap, 1920)
 ```
 
 ```kotlin
-BitmapCompression.scaleDownToWidth(tempFile, 1080)
+BitmapCompression.scaleDownToWidth(tempFile, 1920)
 ```
 
 ```kotlin
-val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToHeight(bitmap, 1920)
+val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToHeight(bitmap, 1080)
 ```
 
 ```kotlin
-BitmapCompression.scaleDownToHeight(tempFile, 1920)
+BitmapCompression.scaleDownToHeight(tempFile, 1080)
 ```
 
  ## License
