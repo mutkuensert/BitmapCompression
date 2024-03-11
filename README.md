@@ -1,4 +1,6 @@
 ## Adding the dependency
+[![](https://jitpack.io/v/mutkuensert/BitmapCompression.svg)](https://jitpack.io/#mutkuensert/BitmapCompression)
+
 Add jitpack into the repositories
 
 ```gradle
@@ -13,6 +15,7 @@ dependencyResolutionManagement {
 ```
 
 Add the dependency in build.gradle file.
+
 ```gradle
 implementation 'com.github.mutkuensert:BitmapCompression:2.1.2'
 ```
