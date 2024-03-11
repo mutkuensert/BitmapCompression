@@ -34,11 +34,11 @@ implementation 'com.github.mutkuensert:BitmapCompression:2.1.2'
 class BitmapCompression(
     private val file: File,
     var sizeLimitBytes: Int,
-    var compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
+    var compressPriority: CompressPriority = CompressPriority.StartByCompress,
     var lowerWidthLimit: Int? = null,
     var lowerHeightLimit: Int? = null,
     @IntRange(from = 1, to = 90)
-    var compressionQualityDownTo: Int = 10,
+    var compressionQualityDownTo: Int = 50,
     @FloatRange(from = 0.1, to = 0.9)
     var scaleDownFactor: Float = 0.8f
 )
@@ -51,22 +51,22 @@ under a specified size limit while maintaining control over compression paramete
 
 ## Usage
 In this example, size reduction starts with scaling down the file prior to compressing process, 
-aiming to reduce the size under 1048576 bytes and prevents scaling the image width down below 1080 pixels.
-If the size reduction can't succeed, lowerWidthLimit is being set to a lower level and compressAndScale 
-function is invoked again so that the size can be reduced.
+aiming to reduce the size under 1048576 bytes and prevents scaling the image width down below 1920 pixels.
+If the size reduction can't succeed, lowerWidthLimit is being set to a lower level and compressAndScaleDown 
+function is invoked again so that the size can be reduced under the specified size limit.
 ```kotlin
 val compression = BitmapCompression(
     file = tempFile,
     sizeLimitBytes = 1048576,
-    compressPriority = BitmapCompression.CompressPriority.STARTBYSCALEDOWN,
-    lowerWidthLimit = 5000,
-    compressionQualityDownTo = 90
+    compressPriority = BitmapCompression.CompressPriority.StartByScaleDown,
+    lowerWidthLimit = 1920,
+    compressionQualityDownTo = 85
 )
 
 try {
     compression.compressAndScaleDown()
 } catch (exception: SizeException) {
-    compression.lowerWidthLimit = 1920
+    compression.lowerWidthLimit = 1280
     compression.compressAndScaleDown()
 }
 ```
