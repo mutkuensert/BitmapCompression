@@ -98,7 +98,7 @@ class BitmapCompression(
             width: Int
         ): Bitmap {
             if (width >= bitmap.width) {
-                Log.i(TAG, "Argument $width is already bigger than or equal to ${bitmap.width}")
+                Log.i(TAG, "Argument $width is already bigger than or equals to ${bitmap.width}")
                 return bitmap
             }
 
@@ -132,7 +132,7 @@ class BitmapCompression(
             height: Int
         ): Bitmap {
             if (height >= bitmap.height) {
-                Log.i(TAG, "Argument $height is already bigger than or equal to ${bitmap.height}")
+                Log.i(TAG, "Argument $height is already bigger than or equals to ${bitmap.height}")
                 return bitmap
             }
 
@@ -145,7 +145,7 @@ class BitmapCompression(
 
     /**
      * @throws SizeException If compression and scaling down processes can't reduce the file
-     * size under the limit with current configuration.
+     * size under the limit within current configuration.
      */
     fun compressAndScaleDown() {
         if (file.length() <= sizeLimitBytes) {
