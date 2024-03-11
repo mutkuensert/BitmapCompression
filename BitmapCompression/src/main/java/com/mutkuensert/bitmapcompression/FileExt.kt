@@ -12,13 +12,9 @@ internal fun File.overwriteByStream(outputStream: ByteArrayOutputStream) {
     }
 }
 
-internal fun File.overwriteByBitmap(bitmap: Bitmap, quality: Int) {
+internal fun File.overwriteByBitmap(bitmap: Bitmap) {
     val byteArrayOutputStream = ByteArrayOutputStream()
-    bitmap.compress(
-        Bitmap.CompressFormat.JPEG,
-        quality,
-        byteArrayOutputStream
-    )
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
     overwriteByStream(byteArrayOutputStream)
     byteArrayOutputStream.close()
 }

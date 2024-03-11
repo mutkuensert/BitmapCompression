@@ -23,7 +23,7 @@ private const val TAG = "BitmapCompression"
 class BitmapCompression(
     private val file: File,
     var sizeLimitBytes: Int,
-    var compressPriority: CompressPriority = CompressPriority.STARTBYCOMPRESS,
+    var compressPriority: CompressPriority = CompressPriority.StartByCompress,
     var lowerWidthLimit: Int? = null,
     var lowerHeightLimit: Int? = null,
     @IntRange(from = 1, to = 90)
@@ -31,9 +31,6 @@ class BitmapCompression(
     @FloatRange(from = 0.1, to = 0.9)
     var scaleDownFactor: Float = 0.8f
 ) {
-    private var _currentCompressionQuality = 90
-    val currentCompressionQuality: Int get() = _currentCompressionQuality
-
     private var bitmap = BitmapFactory.decodeFile(file.absolutePath)
 
     companion object {
@@ -165,26 +162,28 @@ class BitmapCompression(
     }
 
     private fun compress() {
-        var factor = 90
+        var factor = 95
         val byteArrayOutputStream = ByteArrayOutputStream()
 
         do {
             byteArrayOutputStream.reset()
 
-            _currentCompressionQuality = factor
             bitmap.compress(Bitmap.CompressFormat.JPEG, factor, byteArrayOutputStream)
-            factor -= 10
-
-            file.overwriteByStream(byteArrayOutputStream)
+            factor -= 5
 
             if (factor <= compressionQualityDownTo) break
-        } while (file.length() > sizeLimitBytes)
+        } while (byteArrayOutputStream.size() > sizeLimitBytes)
 
+        file.overwriteByStream(byteArrayOutputStream)
         byteArrayOutputStream.close()
     }
 
     private fun scaleDown() {
-        while ((file.length() > sizeLimitBytes)) {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        while ((byteArrayOutputStream.size() > sizeLimitBytes)) {
             val scaledDownWidth = bitmap.width * scaleDownFactor
             val scaledDownHeight = bitmap.height * scaleDownFactor
 
@@ -199,16 +198,20 @@ class BitmapCompression(
                 height = scaledDownHeight.toInt()
             )
 
-            file.overwriteByBitmap(bitmap, currentCompressionQuality)
+            byteArrayOutputStream.reset()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         }
+
+        file.overwriteByStream(byteArrayOutputStream)
+        byteArrayOutputStream.close()
     }
 
     enum class CompressPriority {
-        STARTBYSCALEDOWN, STARTBYCOMPRESS
+        StartByScaleDown, StartByCompress
     }
 
     private fun compressAndScaleDownByPriority() {
-        if (compressPriority == CompressPriority.STARTBYSCALEDOWN) {
+        if (compressPriority == CompressPriority.StartByScaleDown) {
             scaleDown()
             compress()
         } else {
