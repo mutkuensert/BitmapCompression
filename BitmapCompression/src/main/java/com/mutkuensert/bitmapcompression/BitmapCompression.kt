@@ -27,7 +27,7 @@ class BitmapCompression(
     var lowerWidthLimit: Int? = null,
     var lowerHeightLimit: Int? = null,
     @IntRange(from = 1, to = 90)
-    var compressionQualityDownTo: Int = 10,
+    var compressionQualityDownTo: Int = 50,
     @FloatRange(from = 0.1, to = 0.9)
     var scaleDownFactor: Float = 0.8f
 ) {
