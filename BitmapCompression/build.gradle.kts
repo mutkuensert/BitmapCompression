@@ -37,16 +37,3 @@ dependencies {
     implementation(libs.androidx.annotation.jvm)
     implementation(libs.androidx.core.ktx)
 }
-
-afterEvaluate {
-    publishing {
-        publications {
-            register("release", MavenPublication::class) {
-                from(components["release"])
-                groupId = "com.github.mutkuensert"
-                artifactId = "bitmapcompression"
-                version = "2.1.8"
-            }
-        }
-    }
-}

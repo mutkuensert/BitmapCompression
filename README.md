@@ -1,25 +1,3 @@
-## Adding the dependency
-[![](https://jitpack.io/v/mutkuensert/BitmapCompression.svg)](https://jitpack.io/#mutkuensert/BitmapCompression)
-
-Add jitpack into the repositories
-
-```gradle
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-}
-```
-
-Add the dependency in build.gradle file.
-
-```gradle
-implementation 'com.github.mutkuensert:BitmapCompression:2.1.8'
-```
-
 ## Class Information
 ```kotlin
 /**
@@ -88,6 +66,9 @@ val scaledDownToFullHdBitmap = BitmapCompression.scaleDownToHeight(bitmap, 1080)
 ```kotlin
 BitmapCompression.scaleDownToHeight(tempFile, 1080)
 ```
+
+### How to use it
+You can build the library and use it as an aar in a project.
 
  ## License
 ```xml
